@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack --skip-install)",
+      "Bash(ls -la /Users/kumji/.npm/_cacache/content-v2/sha512/06/d8/ 2>&1 | head -5; whoami; ls -ld /Users/kumji/.npm)",
+      "Read(//Users/kumji/.npm/_cacache/content-v2/sha512/06/d8/**)",
+      "Read(//Users/kumji/.npm/**)",
+      "Bash(npm install *)"
+    ]
+  }
+}
