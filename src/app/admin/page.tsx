@@ -28,14 +28,18 @@ export default function AdminLoginPage() {
     }
     setChecking(true);
     setError("");
-    const config = await getConfig();
-    setChecking(false);
-
-    if (config && config.adminPin === pin) {
-      setAdminAuthed();
-      router.push("/admin/dashboard");
-    } else {
-      setError("PIN이 일치하지 않습니다.");
+    try {
+      const config = await getConfig();
+      if (config && config.adminPin === pin) {
+        setAdminAuthed();
+        router.push("/admin/dashboard");
+      } else {
+        setError("PIN이 일치하지 않습니다.");
+      }
+    } catch {
+      setError("설정을 불러오지 못했습니다. 다시 시도해주세요.");
+    } finally {
+      setChecking(false);
     }
   }
 

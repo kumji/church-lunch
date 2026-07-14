@@ -70,7 +70,7 @@ export default function EntryPage() {
               placeholder="이름"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-48 rounded-lg border-2 border-stone-300 px-4 py-3 text-center text-lg font-medium outline-none focus:border-stone-500"
+              className="h-14 w-48 rounded-lg border-2 border-stone-300 px-4 text-center text-lg font-medium outline-none focus:border-stone-500"
             />
             <input
               type="text"
@@ -79,14 +79,14 @@ export default function EntryPage() {
               placeholder="0000"
               value={phoneLast4}
               onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
-              className="w-40 rounded-lg border-2 border-stone-300 px-4 py-3 text-center text-lg font-medium tracking-[0.3em] outline-none focus:border-stone-500"
+              className="h-14 w-48 rounded-lg border-2 border-stone-300 px-4 text-center text-lg font-medium tracking-[0.3em] outline-none focus:border-stone-500"
             />
 
             {error && <p className="text-sm text-red-600">{error}</p>}
 
             <button
               type="submit"
-              className="mt-2 w-48 rounded-lg bg-amber-700 py-3 text-base font-medium text-white hover:bg-amber-800"
+              className="mt-2 flex h-14 w-48 items-center justify-center rounded-lg bg-amber-700 text-lg font-medium text-white hover:bg-amber-800"
             >
               확인
             </button>

@@ -1,4 +1,4 @@
-import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { db } from "./firebase";
 import type { Config } from "./types";
 
@@ -10,9 +10,20 @@ export const DEFAULT_CONFIG: Config = {
   adminPin: "0000",
 };
 
-export async function getConfig(): Promise<Config | null> {
-  const snap = await getDoc(configRef);
-  return snap.exists() ? (snap.data() as Config) : null;
+export function getConfig(): Promise<Config | null> {
+  return new Promise((resolve) => {
+    const unsubscribe = onSnapshot(
+      configRef,
+      (snap) => {
+        unsubscribe();
+        resolve(snap.exists() ? (snap.data() as Config) : null);
+      },
+      () => {
+        unsubscribe();
+        resolve(null);
+      }
+    );
+  });
 }
 
 export function subscribeConfig(callback: (config: Config | null) => void) {
