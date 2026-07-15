@@ -85,18 +85,6 @@ export async function deleteAllOrders(): Promise<void> {
   }
 }
 
-// 사용자: 입금확인요청 (none -> pending). 이미 pending/confirmed면 상태 변경 없음.
-export async function requestPayment(order: Order): Promise<"requested" | "already-requested"> {
-  if (order.paymentStatus !== "none") {
-    return "already-requested";
-  }
-  await updateDoc(doc(db, "orders", order.id), {
-    paymentStatus: "pending" as PaymentStatus,
-    confirmedAmount: order.totalAmount,
-  });
-  return "requested";
-}
-
 // 관리자: 입금 상태 직접 변경 (예: none/pending -> confirmed)
 export async function setPaymentStatus(order: Order, status: PaymentStatus): Promise<void> {
   const snapshot =

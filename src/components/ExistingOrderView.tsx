@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import MenuQuantitySelector from "./MenuQuantitySelector";
 import BankInfoCard from "./BankInfoCard";
-import { calcTotal, deleteOrder, requestPayment, updateOrderItems } from "@/lib/orders";
+import { calcTotal, deleteOrder, updateOrderItems } from "@/lib/orders";
 import { isPastDeadline } from "@/lib/time";
 import { PAYMENT_STATUS_LABEL } from "@/lib/types";
 import type { BankInfo, Menu, Order, OrderItem } from "@/lib/types";
@@ -56,17 +56,6 @@ export default function ExistingOrderView({ order, menus, bankInfo, deadline, on
     await deleteOrder(order.id);
     setBusy(false);
     onDeleted();
-  }
-
-  async function handleRequestPayment() {
-    setBusy(true);
-    const result = await requestPayment(order);
-    setBusy(false);
-    if (result === "already-requested") {
-      setNotice("이미 요청이 완료되었습니다.");
-    } else {
-      onChanged();
-    }
   }
 
   const lockMessage = closed
@@ -133,28 +122,6 @@ export default function ExistingOrderView({ order, menus, bankInfo, deadline, on
       <BankInfoCard bankInfo={bankInfo} />
 
       {notice && <p className="text-sm text-red-600">{notice}</p>}
-
-      {order.paymentStatus === "none" && (
-        <>
-          <p className="text-sm text-stone-900">
-            입금 후 확인 요청 버튼을 눌러주세요. 버튼을 누른 뒤에는 주문 수정, 취소가 불가합니다.
-          </p>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={handleRequestPayment}
-            className="rounded-lg bg-amber-500 py-3 font-medium text-white disabled:opacity-50"
-          >
-            입금확인요청
-          </button>
-        </>
-      )}
-
-      {order.paymentStatus === "pending" && (
-        <button type="button" disabled className="rounded-lg bg-stone-300 py-3 font-medium text-stone-600">
-          요청이 완료되었습니다
-        </button>
-      )}
 
       {lockMessage && <p className="text-center text-sm text-stone-900">{lockMessage}</p>}
 
