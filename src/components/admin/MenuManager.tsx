@@ -6,6 +6,7 @@ import { resizeImageToDataUrl } from "@/lib/image";
 import {
   addMenuTemplate,
   deleteMenuTemplate,
+  reconcileMenuTemplates,
   subscribeMenuTemplates,
   type MenuTemplate,
 } from "@/lib/menuTemplates";
@@ -24,6 +25,12 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
   useEffect(() => {
     return subscribeMenuTemplates(setTemplates);
   }, []);
+
+  useEffect(() => {
+    if (templates.length > 0) {
+      reconcileMenuTemplates(menus, templates);
+    }
+  }, [menus, templates]);
 
   function startEdit(menu: Menu) {
     setEditingId(menu.id);
@@ -73,7 +80,7 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
   }
 
   async function handleRemember(menu: Menu) {
-    await addMenuTemplate({ name: menu.name, price: menu.price, imgUrl: menu.imgUrl });
+    await addMenuTemplate({ name: menu.name, price: menu.price, imgUrl: menu.imgUrl, sourceMenuId: menu.id });
   }
 
   async function handleAddFromTemplate(template: MenuTemplate) {
@@ -145,31 +152,42 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
         </div>
       </form>
 
-      <ul className="divide-y divide-stone-100 rounded-lg border border-stone-200">
-        {menus.length === 0 && <li className="p-4 text-sm text-stone-900">등록된 메뉴가 없습니다.</li>}
-        {menus.map((menu) => (
-          <li key={menu.id} className="flex items-center justify-between gap-3 p-3">
-            <div>
-              <p className="font-medium">{menu.name}</p>
-              <p className="text-sm text-stone-900">{menu.price.toLocaleString()}원</p>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={() => handleRemember(menu)} className="rounded-md border border-stone-300 px-3 py-1.5 text-sm">
-                기억하기
-              </button>
-              <button onClick={() => startEdit(menu)} className="rounded-md border border-stone-300 px-3 py-1.5 text-sm">
-                수정
-              </button>
-              <button
-                onClick={() => handleDelete(menu.id)}
-                className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-600"
-              >
-                삭제
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div>
+        <p className="mb-2 text-sm font-medium text-stone-900">현재 등록된 메뉴</p>
+        <ul className="divide-y divide-stone-100 rounded-lg border-2 border-amber-200 bg-amber-50/40">
+          {menus.length === 0 && <li className="p-4 text-sm text-stone-900">등록된 메뉴가 없습니다.</li>}
+          {menus.map((menu) => (
+            <li key={menu.id} className="flex items-center justify-between gap-3 p-3">
+              <div className="flex items-center gap-3">
+                {menu.imgUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- 저장된 data URL 썸네일이라 next/image 최적화 대상이 아님
+                  <img src={menu.imgUrl} alt="" className="h-12 w-12 rounded object-cover" />
+                ) : (
+                  <div className="h-12 w-12 shrink-0 rounded bg-stone-100" />
+                )}
+                <div>
+                  <p className="font-medium">{menu.name}</p>
+                  <p className="text-sm text-stone-900">{menu.price.toLocaleString()}원</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => handleRemember(menu)} className="rounded-md border border-stone-300 px-3 py-1.5 text-sm">
+                  기억하기
+                </button>
+                <button onClick={() => startEdit(menu)} className="rounded-md border border-stone-300 px-3 py-1.5 text-sm">
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDelete(menu.id)}
+                  className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-600"
+                >
+                  삭제
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <div>
         <p className="mb-2 text-sm text-stone-900">기억해둔 메뉴 (클릭 한 번으로 추가)</p>
