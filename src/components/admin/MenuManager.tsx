@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { addMenu, deleteMenu, updateMenu } from "@/lib/menus";
 import { resizeImageToDataUrl } from "@/lib/image";
+import {
+  addMenuTemplate,
+  deleteMenuTemplate,
+  subscribeMenuTemplates,
+  type MenuTemplate,
+} from "@/lib/menuTemplates";
 import type { Menu, NewMenu } from "@/lib/types";
 
 const emptyForm: NewMenu = { name: "", price: 0, imgUrl: "" };
@@ -13,6 +19,11 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
   const [saving, setSaving] = useState(false);
   const [processingImage, setProcessingImage] = useState(false);
   const [imageError, setImageError] = useState("");
+  const [templates, setTemplates] = useState<MenuTemplate[]>([]);
+
+  useEffect(() => {
+    return subscribeMenuTemplates(setTemplates);
+  }, []);
 
   function startEdit(menu: Menu) {
     setEditingId(menu.id);
@@ -59,6 +70,19 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
     if (!confirm("메뉴를 삭제하시겠습니까?")) return;
     await deleteMenu(id);
     if (editingId === id) resetForm();
+  }
+
+  async function handleRemember(menu: Menu) {
+    await addMenuTemplate({ name: menu.name, price: menu.price, imgUrl: menu.imgUrl });
+  }
+
+  async function handleAddFromTemplate(template: MenuTemplate) {
+    await addMenu({ name: template.name, price: template.price, imgUrl: template.imgUrl });
+  }
+
+  async function handleDeleteTemplate(id: string) {
+    if (!confirm("기억해둔 메뉴를 삭제하시겠습니까?")) return;
+    await deleteMenuTemplate(id);
   }
 
   return (
@@ -130,6 +154,9 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
               <p className="text-sm text-stone-900">{menu.price.toLocaleString()}원</p>
             </div>
             <div className="flex gap-2">
+              <button onClick={() => handleRemember(menu)} className="rounded-md border border-stone-300 px-3 py-1.5 text-sm">
+                기억하기
+              </button>
               <button onClick={() => startEdit(menu)} className="rounded-md border border-stone-300 px-3 py-1.5 text-sm">
                 수정
               </button>
@@ -143,6 +170,48 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
           </li>
         ))}
       </ul>
+
+      <div>
+        <p className="mb-2 text-sm text-stone-900">기억해둔 메뉴 (클릭 한 번으로 추가)</p>
+        {templates.length === 0 ? (
+          <p className="rounded-lg border border-stone-200 p-4 text-sm text-stone-900">
+            아직 기억해둔 메뉴가 없습니다. 위 목록에서 “기억하기”를 눌러 자주 쓰는 메뉴를 저장해보세요.
+          </p>
+        ) : (
+          <ul className="divide-y divide-stone-100 rounded-lg border border-stone-200">
+            {templates.map((template) => (
+              <li key={template.id} className="flex items-center justify-between gap-3 p-3">
+                <div className="flex items-center gap-3">
+                  {template.imgUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- 저장된 data URL 썸네일이라 next/image 최적화 대상이 아님
+                    <img src={template.imgUrl} alt="" className="h-12 w-12 rounded object-cover" />
+                  ) : (
+                    <div className="h-12 w-12 shrink-0 rounded bg-stone-100" />
+                  )}
+                  <div>
+                    <p className="font-medium">{template.name}</p>
+                    <p className="text-sm text-stone-900">{template.price.toLocaleString()}원</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAddFromTemplate(template)}
+                    className="rounded-md bg-amber-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-800"
+                  >
+                    추가
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTemplate(template.id)}
+                    className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-600"
+                  >
+                    삭제
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
