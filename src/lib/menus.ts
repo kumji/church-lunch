@@ -35,3 +35,8 @@ export async function updateMenu(id: string, menu: Partial<NewMenu>): Promise<vo
 export async function deleteMenu(id: string): Promise<void> {
   await deleteDoc(doc(db, "menus", id));
 }
+
+export function isDuplicateMenuName(menus: Menu[], name: string, excludeId?: string): boolean {
+  const trimmed = name.trim();
+  return menus.some((m) => m.id !== excludeId && m.name === trimmed);
+}

@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -21,7 +22,7 @@ export function calcTotal(items: OrderItem[]): number {
   return items.reduce((sum, item) => sum + item.price * item.qty, 0);
 }
 
-// 입금 확인/요청 이후 메뉴 가격이 바뀌어 totalAmount가 재계산된 경우의 차익.
+// 입금 확인 이후 메뉴 가격이 바뀌어 totalAmount가 재계산된 경우의 차익.
 // 아직 confirmedAmount가 없거나(미입금) 차익이 없으면 null.
 export function amountDiff(order: Order): number | null {
   if (order.confirmedAmount === undefined) return null;
@@ -85,19 +86,29 @@ export async function deleteAllOrders(): Promise<void> {
   }
 }
 
-// 관리자: 입금 상태 직접 변경 (예: none/pending -> confirmed)
+// 관리자: 입금 확인 처리 (none -> confirmed). 처음 확인되는 시점의 totalAmount를
+// confirmedAmount로 남겨, 이후 가격 변동에 따른 차익을 계산할 수 있게 한다.
 export async function setPaymentStatus(order: Order, status: PaymentStatus): Promise<void> {
   const snapshot =
-    status !== "none" && order.confirmedAmount === undefined
+    status === "confirmed" && order.confirmedAmount === undefined
       ? { confirmedAmount: order.totalAmount }
       : {};
   await updateDoc(doc(db, "orders", order.id), { paymentStatus: status, ...snapshot });
 }
 
+// 관리자: 입금 확인을 되돌려 다시 미입금 상태로 되돌린다. 다음에 다시 확인할 때
+// 그 시점의 금액을 새로 기준선으로 잡도록 confirmedAmount도 함께 지운다.
+export async function revertPaymentStatus(order: Order): Promise<void> {
+  await updateDoc(doc(db, "orders", order.id), {
+    paymentStatus: "none" as PaymentStatus,
+    confirmedAmount: deleteField(),
+  });
+}
+
 // 관리자: 대시보드가 열려 있는 동안 메뉴(이름/가격) 최신 값과 어긋난 주문 항목을
 // 지속적으로 맞춰준다. 메뉴 저장 시점뿐 아니라 과거에 반영이 누락된 주문도
 // 다음 로딩 때 자연히 복구된다.
-// 가격이 바뀌어 총액이 달라지는데 이미 입금 확인/요청되어 있고 아직
+// 가격이 바뀌어 총액이 달라지는데 이미 입금 확인되어 있고 아직
 // confirmedAmount가 없는 주문은, 지금까지의 totalAmount를 기준선으로 남겨
 // 이후 차익(totalAmount - confirmedAmount)을 화면에 표시할 수 있게 한다.
 export async function reconcileOrdersWithMenus(orders: Order[], menus: Menu[]): Promise<void> {

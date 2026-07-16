@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
         setAdminAuthed();
         router.push("/admin/dashboard");
       } else {
-        setError("PIN이 일치하지 않습니다.");
+        setError("번호가 맞지 않습니다.");
       }
     } catch {
       setError("설정을 불러오지 못했습니다. 다시 시도해주세요.");

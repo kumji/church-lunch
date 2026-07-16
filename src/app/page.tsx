@@ -6,6 +6,7 @@ import CountdownTimer from "@/components/CountdownTimer";
 import { saveIdentity } from "@/lib/session";
 import { subscribeConfig } from "@/lib/settings";
 import { isPastDeadline } from "@/lib/time";
+import { validateEntryForm } from "@/lib/validation";
 
 export default function EntryPage() {
   const router = useRouter();
@@ -25,18 +26,13 @@ export default function EntryPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const trimmedName = name.trim();
-
-    if (!trimmedName) {
-      setError("이름을 입력해주세요.");
-      return;
-    }
-    if (!/^\d{4}$/.test(phoneLast4)) {
-      setError("휴대폰 번호 뒷자리 4자리를 정확히 입력해주세요.");
+    const validationError = validateEntryForm(name, phoneLast4);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
-    saveIdentity({ name: trimmedName, phoneLast4 });
+    saveIdentity({ name: name.trim(), phoneLast4 });
     router.push("/order");
   }
 

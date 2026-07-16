@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { amountDiff, setPaymentStatus } from "@/lib/orders";
+import { amountDiff, revertPaymentStatus, setPaymentStatus } from "@/lib/orders";
 import { downloadCsv, ordersToCsv } from "@/lib/csv";
 import type { Order, PaymentStatus } from "@/lib/types";
 
 const GROUPS: { status: PaymentStatus; title: string }[] = [
   { status: "none", title: "미입금" },
-  { status: "pending", title: "확인요청" },
   { status: "confirmed", title: "입금완료" },
 ];
 
@@ -72,7 +71,14 @@ export default function PaymentManager({ orders }: { orders: Order[] }) {
                           {order.items.map((item) => `${item.menuName} x${item.qty}`).join(", ")}
                         </p>
                       </div>
-                      {group.status !== "confirmed" && (
+                      {group.status === "confirmed" ? (
+                        <button
+                          onClick={() => revertPaymentStatus(order)}
+                          className="shrink-0 rounded-md border border-stone-300 px-3 py-1.5 text-sm font-medium hover:bg-stone-50"
+                        >
+                          되돌리기
+                        </button>
+                      ) : (
                         <button
                           onClick={() => setPaymentStatus(order, "confirmed")}
                           className="shrink-0 rounded-md bg-amber-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-800"

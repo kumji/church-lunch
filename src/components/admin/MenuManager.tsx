@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { addMenu, deleteMenu, updateMenu } from "@/lib/menus";
+import { addMenu, deleteMenu, isDuplicateMenuName, updateMenu } from "@/lib/menus";
 import { resizeImageToDataUrl } from "@/lib/image";
 import {
   addMenuTemplate,
@@ -20,6 +20,8 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
   const [saving, setSaving] = useState(false);
   const [processingImage, setProcessingImage] = useState(false);
   const [imageError, setImageError] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [templateNotice, setTemplateNotice] = useState("");
   const [templates, setTemplates] = useState<MenuTemplate[]>([]);
   const [busyKeys, setBusyKeys] = useState<Set<string>>(new Set());
 
@@ -53,12 +55,14 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
     setEditingId(menu.id);
     setForm({ name: menu.name, price: menu.price, imgUrl: menu.imgUrl });
     setImageError("");
+    setNameError("");
   }
 
   function resetForm() {
     setEditingId(null);
     setForm(emptyForm);
     setImageError("");
+    setNameError("");
   }
 
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -80,6 +84,11 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name.trim() || form.price < 0) return;
+    setNameError("");
+    if (isDuplicateMenuName(menus, form.name, editingId ?? undefined)) {
+      setNameError("이미 등록된 메뉴입니다.");
+      return;
+    }
     setSaving(true);
     if (editingId) {
       await updateMenu(editingId, form);
@@ -101,6 +110,11 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
   }
 
   async function handleAddFromTemplate(template: MenuTemplate) {
+    setTemplateNotice("");
+    if (isDuplicateMenuName(menus, template.name)) {
+      setTemplateNotice(`이미 등록된 메뉴입니다 (${template.name}).`);
+      return;
+    }
     await addMenu({ name: template.name, price: template.price, imgUrl: template.imgUrl });
   }
 
@@ -113,16 +127,22 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
     <div className="flex flex-col gap-6">
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-lg border border-stone-200 p-4 sm:flex-row sm:items-end">
         <div className="flex-1">
-          <label className="mb-1 block text-sm text-stone-900">메뉴명</label>
+          <label htmlFor="menu-name" className="mb-1 block text-sm text-stone-900">메뉴명</label>
           <input
+            id="menu-name"
             value={form.name}
-            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            onChange={(e) => {
+              setForm((f) => ({ ...f, name: e.target.value }));
+              setNameError("");
+            }}
             className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
           />
+          {nameError && <p className="mt-1 text-sm text-red-600">{nameError}</p>}
         </div>
         <div className="w-full sm:w-32">
-          <label className="mb-1 block text-sm text-stone-900">가격</label>
+          <label htmlFor="menu-price" className="mb-1 block text-sm text-stone-900">가격</label>
           <input
+            id="menu-price"
             type="text"
             inputMode="numeric"
             placeholder="0"
@@ -213,6 +233,7 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
 
       <div>
         <p className="mb-2 text-sm text-stone-900">기억해둔 메뉴 (클릭 한 번으로 추가)</p>
+        {templateNotice && <p className="mb-2 text-sm text-red-600">{templateNotice}</p>}
         {templates.length === 0 ? (
           <p className="rounded-lg border border-stone-200 p-4 text-sm text-stone-900">
             아직 기억해둔 메뉴가 없습니다. 위 목록에서 “기억하기”를 눌러 자주 쓰는 메뉴를 저장해보세요.

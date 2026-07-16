@@ -41,8 +41,9 @@ export default function SettingsManager({ config }: { config: Config | null }) {
   return (
     <form onSubmit={handleSave} className="flex flex-col gap-5 rounded-lg border border-stone-200 p-4">
       <div>
-        <label className="mb-1 block text-sm text-stone-900">마감 시간 (한국 표준시 기준)</label>
+        <label htmlFor="deadline" className="mb-1 block text-sm text-stone-900">마감 시간 (한국 표준시 기준)</label>
         <input
+          id="deadline"
           type="datetime-local"
           value={deadlineLocal}
           onChange={(e) => setDeadlineLocal(e.target.value)}
@@ -52,24 +53,27 @@ export default function SettingsManager({ config }: { config: Config | null }) {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
-          <label className="mb-1 block text-sm text-stone-900">은행명</label>
+          <label htmlFor="bank-name" className="mb-1 block text-sm text-stone-900">은행명</label>
           <input
+            id="bank-name"
             value={bankName}
             onChange={(e) => setBankName(e.target.value)}
             className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-stone-900">계좌번호</label>
+          <label htmlFor="account-number" className="mb-1 block text-sm text-stone-900">계좌번호</label>
           <input
+            id="account-number"
             value={accountNumber}
             onChange={(e) => setAccountNumber(e.target.value)}
             className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-stone-900">예금주</label>
+          <label htmlFor="account-holder" className="mb-1 block text-sm text-stone-900">예금주</label>
           <input
+            id="account-holder"
             value={accountHolder}
             onChange={(e) => setAccountHolder(e.target.value)}
             className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
@@ -78,8 +82,9 @@ export default function SettingsManager({ config }: { config: Config | null }) {
       </div>
 
       <div>
-        <label className="mb-1 block text-sm text-stone-900">관리자 PIN (4자리 숫자)</label>
+        <label htmlFor="admin-pin" className="mb-1 block text-sm text-stone-900">관리자 PIN (4자리 숫자)</label>
         <input
+          id="admin-pin"
           inputMode="numeric"
           maxLength={4}
           value={adminPin}

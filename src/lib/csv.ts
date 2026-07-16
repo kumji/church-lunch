@@ -1,10 +1,5 @@
+import { PAYMENT_STATUS_LABEL } from "./types";
 import type { Order } from "./types";
-
-const STATUS_LABEL: Record<string, string> = {
-  none: "미입금",
-  pending: "확인요청",
-  confirmed: "입금완료",
-};
 
 function escapeCsvField(value: string | number): string {
   const str = String(value);
@@ -28,7 +23,7 @@ export function ordersToCsv(orders: Order[]): string {
         escapeCsvField(menuNames),
         escapeCsvField(qtys),
         escapeCsvField(order.totalAmount),
-        escapeCsvField(STATUS_LABEL[order.paymentStatus] ?? order.paymentStatus),
+        escapeCsvField(PAYMENT_STATUS_LABEL[order.paymentStatus]),
       ].join(",")
     );
   }

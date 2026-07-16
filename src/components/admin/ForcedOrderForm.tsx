@@ -7,7 +7,6 @@ import type { Menu, OrderItem, PaymentStatus } from "@/lib/types";
 
 const STATUS_OPTIONS: { value: PaymentStatus; label: string }[] = [
   { value: "none", label: "미입금" },
-  { value: "pending", label: "확인요청" },
   { value: "confirmed", label: "입금완료" },
 ];
 
