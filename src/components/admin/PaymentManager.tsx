@@ -16,7 +16,8 @@ export default function PaymentManager({ orders }: { orders: Order[] }) {
 
   const filtered = useMemo(() => {
     const term = search.trim();
-    return term ? orders.filter((o) => o.name.includes(term)) : orders;
+    const matched = term ? orders.filter((o) => o.name.includes(term)) : orders;
+    return [...matched].sort((a, b) => a.name.localeCompare(b.name, "ko"));
   }, [orders, search]);
 
   function handleDownload() {

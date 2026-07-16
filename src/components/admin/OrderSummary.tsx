@@ -12,7 +12,8 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
 
   const filteredOrders = useMemo(() => {
     const term = search.trim();
-    return term ? orders.filter((o) => o.name.includes(term)) : orders;
+    const matched = term ? orders.filter((o) => o.name.includes(term)) : orders;
+    return [...matched].sort((a, b) => a.name.localeCompare(b.name, "ko"));
   }, [orders, search]);
 
   const menuStats = new Map<string, { qty: number; revenue: number }>();

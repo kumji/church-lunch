@@ -21,6 +21,23 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
   const [processingImage, setProcessingImage] = useState(false);
   const [imageError, setImageError] = useState("");
   const [templates, setTemplates] = useState<MenuTemplate[]>([]);
+  const [busyKeys, setBusyKeys] = useState<Set<string>>(new Set());
+
+  function withBusyGuard(key: string, action: () => Promise<void>): () => Promise<void> {
+    return async () => {
+      if (busyKeys.has(key)) return;
+      setBusyKeys((prev) => new Set(prev).add(key));
+      try {
+        await action();
+      } finally {
+        setBusyKeys((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
+      }
+    };
+  }
 
   useEffect(() => {
     return subscribeMenuTemplates(setTemplates);
@@ -171,15 +188,20 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
                 </div>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => handleRemember(menu)} className="rounded-md border border-stone-300 px-3 py-1.5 text-sm">
+                <button
+                  onClick={withBusyGuard(`remember:${menu.id}`, () => handleRemember(menu))}
+                  disabled={busyKeys.has(`remember:${menu.id}`)}
+                  className="rounded-md border border-stone-300 px-3 py-1.5 text-sm disabled:opacity-50"
+                >
                   기억하기
                 </button>
                 <button onClick={() => startEdit(menu)} className="rounded-md border border-stone-300 px-3 py-1.5 text-sm">
                   수정
                 </button>
                 <button
-                  onClick={() => handleDelete(menu.id)}
-                  className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-600"
+                  onClick={withBusyGuard(`delete:${menu.id}`, () => handleDelete(menu.id))}
+                  disabled={busyKeys.has(`delete:${menu.id}`)}
+                  className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-600 disabled:opacity-50"
                 >
                   삭제
                 </button>
@@ -213,14 +235,16 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleAddFromTemplate(template)}
-                    className="rounded-md bg-amber-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-800"
+                    onClick={withBusyGuard(`add:${template.id}`, () => handleAddFromTemplate(template))}
+                    disabled={busyKeys.has(`add:${template.id}`)}
+                    className="rounded-md bg-amber-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-800 disabled:opacity-50"
                   >
                     추가
                   </button>
                   <button
-                    onClick={() => handleDeleteTemplate(template.id)}
-                    className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-600"
+                    onClick={withBusyGuard(`deleteTemplate:${template.id}`, () => handleDeleteTemplate(template.id))}
+                    disabled={busyKeys.has(`deleteTemplate:${template.id}`)}
+                    className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-600 disabled:opacity-50"
                   >
                     삭제
                   </button>
