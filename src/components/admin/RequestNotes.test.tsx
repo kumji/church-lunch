@@ -17,7 +17,7 @@ function makeOrder(overrides: Partial<Order>): Order {
 }
 
 describe("RequestNotes 추가요청사항", () => {
-  it("요청 사항이 있는 주문만 주문자명/뒷자리/요청사항으로 보여준다", () => {
+  it("요청 사항이 있는 주문만 이름(뒷자리)/요청사항으로 보여준다", () => {
     const orders: Order[] = [
       makeOrder({ id: "o1", name: "나윤", phoneLast4: "5678", requestNote: "라면 맵게" }),
       makeOrder({ id: "o2", name: "가영", phoneLast4: "1234", requestNote: "김밥에 계란 빼주세요" }),
@@ -27,11 +27,10 @@ describe("RequestNotes 추가요청사항", () => {
 
     const rows = screen.getAllByRole("row").slice(1);
     expect(rows).toHaveLength(2);
-    expect(rows[0]).toHaveTextContent("가영");
-    expect(rows[0]).toHaveTextContent("1234");
+    expect(screen.getByText("가영(1234)")).toBeInTheDocument();
     expect(rows[0]).toHaveTextContent("김밥에 계란 빼주세요");
-    expect(rows[1]).toHaveTextContent("나윤");
-    expect(screen.queryByText("다현")).not.toBeInTheDocument();
+    expect(screen.getByText("나윤(5678)")).toBeInTheDocument();
+    expect(screen.queryByText("다현", { exact: false })).not.toBeInTheDocument();
   });
 
   it("요청 사항이 하나도 없으면 안내 문구를 보여준다", () => {

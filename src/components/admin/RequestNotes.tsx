@@ -23,15 +23,15 @@ export default function RequestNotes({ orders }: { orders: Order[] }) {
             <thead className="sticky top-0 bg-stone-50 text-stone-900">
               <tr>
                 <th className="px-3 py-2 font-medium">주문자명</th>
-                <th className="px-3 py-2 font-medium">뒷자리</th>
                 <th className="px-3 py-2 font-medium">요청사항</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
               {requests.map((order) => (
                 <tr key={order.id}>
-                  <td className="px-3 py-2">{order.name}</td>
-                  <td className="px-3 py-2">{order.phoneLast4}</td>
+                  <td className="px-3 py-2">
+                    {order.name}({order.phoneLast4})
+                  </td>
                   <td className="px-3 py-2">{order.requestNote}</td>
                 </tr>
               ))}
