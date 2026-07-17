@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { addMenu, deleteMenu, isDuplicateMenuName, updateMenu } from "@/lib/menus";
 import { resizeImageToDataUrl } from "@/lib/image";
 import {
@@ -24,6 +24,11 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
   const [templateNotice, setTemplateNotice] = useState("");
   const [templates, setTemplates] = useState<MenuTemplate[]>([]);
   const [busyKeys, setBusyKeys] = useState<Set<string>>(new Set());
+
+  const sortedMenus = useMemo(
+    () => [...menus].sort((a, b) => a.name.localeCompare(b.name, "ko")),
+    [menus]
+  );
 
   function withBusyGuard(key: string, action: () => Promise<void>): () => Promise<void> {
     return async () => {
@@ -192,8 +197,8 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
       <div>
         <p className="mb-2 text-sm font-medium text-stone-900">현재 등록된 메뉴</p>
         <ul className="divide-y divide-stone-100 rounded-lg border-2 border-amber-200 bg-amber-50/40">
-          {menus.length === 0 && <li className="p-4 text-sm text-stone-900">등록된 메뉴가 없습니다.</li>}
-          {menus.map((menu) => (
+          {sortedMenus.length === 0 && <li className="p-4 text-sm text-stone-900">등록된 메뉴가 없습니다.</li>}
+          {sortedMenus.map((menu) => (
             <li key={menu.id} className="flex items-center justify-between gap-3 p-3">
               <div className="flex items-center gap-3">
                 {menu.imgUrl ? (
