@@ -167,7 +167,7 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              className="flex-1 text-sm"
+              className="flex-1 text-sm text-stone-700 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-amber-700 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-amber-800"
             />
           </div>
           {processingImage && <p className="mt-1 text-sm text-stone-900">이미지 처리 중...</p>}
@@ -213,7 +213,7 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
                   disabled={busyKeys.has(`remember:${menu.id}`)}
                   className="rounded-md border border-stone-300 px-3 py-1.5 text-sm disabled:opacity-50"
                 >
-                  기억하기
+                  기억
                 </button>
                 <button onClick={() => startEdit(menu)} className="rounded-md border border-stone-300 px-3 py-1.5 text-sm">
                   수정
@@ -236,7 +236,7 @@ export default function MenuManager({ menus }: { menus: Menu[] }) {
         {templateNotice && <p className="mb-2 text-sm text-red-600">{templateNotice}</p>}
         {templates.length === 0 ? (
           <p className="rounded-lg border border-stone-200 p-4 text-sm text-stone-900">
-            아직 기억해둔 메뉴가 없습니다. 위 목록에서 “기억하기”를 눌러 자주 쓰는 메뉴를 저장해보세요.
+            아직 기억해둔 메뉴가 없습니다. 위 목록에서 “기억”을 눌러 자주 쓰는 메뉴를 저장해보세요.
           </p>
         ) : (
           <ul className="divide-y divide-stone-100 rounded-lg border border-stone-200">

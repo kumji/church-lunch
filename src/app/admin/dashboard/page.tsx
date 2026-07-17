@@ -84,13 +84,15 @@ export default function AdminDashboardPage() {
           </button>
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-2 border-b border-stone-200">
+        <div className="mb-6 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`px-3 py-2 text-sm font-medium text-stone-900 ${
-                tab === t.key ? "border-b-2 border-amber-700" : ""
+              className={`rounded-md px-3 py-2 text-xs font-medium sm:text-sm ${
+                tab === t.key
+                  ? "bg-amber-700 text-white"
+                  : "border border-stone-300 bg-white text-stone-900 hover:bg-stone-50"
               }`}
             >
               {t.label}

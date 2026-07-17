@@ -116,7 +116,7 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
                   <th className="px-3 py-2 font-medium">주문자명</th>
                   <th className="px-3 py-2 font-medium">주문한 메뉴</th>
                   <th className="px-3 py-2 text-right font-medium">총금액</th>
-                  <th className="px-3 py-2 font-medium">입금여부</th>
+                  <th className="px-3 py-2 text-center font-medium">입금여부</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
@@ -140,7 +140,14 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
                           </span>
                         )}
                       </td>
-                      <td className="px-3 py-2">{PAYMENT_STATUS_LABEL[order.paymentStatus]}</td>
+                      <td
+                        className={`px-3 py-2 text-center font-semibold ${
+                          order.paymentStatus === "confirmed" ? "text-green-600" : "text-red-600"
+                        }`}
+                        title={PAYMENT_STATUS_LABEL[order.paymentStatus]}
+                      >
+                        {order.paymentStatus === "confirmed" ? "O" : "X"}
+                      </td>
                     </tr>
                   );
                 })}

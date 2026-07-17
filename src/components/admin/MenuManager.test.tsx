@@ -80,7 +80,7 @@ describe("MenuManager 메뉴 추가/수정/삭제", () => {
   it("메뉴를 자주 주문하는 메뉴(기억해둔 메뉴)로 등록할 수 있다", () => {
     render(<MenuManager menus={[kimbap]} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "기억하기" }));
+    fireEvent.click(screen.getByRole("button", { name: "기억" }));
 
     expect(addMenuTemplate).toHaveBeenCalledWith({
       name: "김밥",

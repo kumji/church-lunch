@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import BankInfoCard from "./BankInfoCard";
 
 describe("BankInfoCard 계좌 정보 표시", () => {
@@ -18,5 +18,20 @@ describe("BankInfoCard 계좌 정보 표시", () => {
     );
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("계좌 복사 버튼을 누르면 계좌번호만 클립보드에 복사한다", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    render(
+      <BankInfoCard bankInfo={{ bankName: "카카오뱅크", accountNumber: "1234567", accountHolder: "전지현" }} />
+    );
+    fireEvent.click(screen.getByRole("button", { name: "계좌 복사" }));
+
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith("1234567");
+      expect(screen.getByRole("button", { name: "복사됨" })).toBeInTheDocument();
+    });
   });
 });

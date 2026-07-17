@@ -65,4 +65,17 @@ describe("OrderSummary 주문 현황", () => {
     // 가영(원래 김밥만 주문)과, 라면이 필터링되어 김밥만 남은 다현 두 행 모두 "김밥 x1"만 보여야 한다.
     expect(screen.getAllByText("김밥 x1")).toHaveLength(2);
   });
+
+  it("입금여부는 미입금이면 X, 입금완료면 O로 표시된다", () => {
+    const item = { menuId: "m1", menuName: "김밥", price: 3000, qty: 1 };
+    const mixedOrders: Order[] = [
+      makeOrder({ id: "o1", name: "가영", items: [item], totalAmount: 3000, paymentStatus: "none" }),
+      makeOrder({ id: "o2", name: "나윤", items: [item], totalAmount: 3000, paymentStatus: "confirmed" }),
+    ];
+    render(<OrderSummary orders={mixedOrders} />);
+
+    const rows = screen.getAllByRole("row").slice(1);
+    expect(rows[0]).toHaveTextContent("X");
+    expect(rows[1]).toHaveTextContent("O");
+  });
 });
