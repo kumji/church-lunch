@@ -3,18 +3,14 @@
 import { useMemo, useState } from "react";
 import MenuQuantitySelector from "@/components/MenuQuantitySelector";
 import { calcTotal, createOrder } from "@/lib/orders";
-import type { Menu, OrderItem, PaymentStatus } from "@/lib/types";
-
-const STATUS_OPTIONS: { value: PaymentStatus; label: string }[] = [
-  { value: "none", label: "미입금" },
-  { value: "confirmed", label: "입금완료" },
-];
+import { REQUEST_NOTE_MAX_LENGTH } from "@/lib/types";
+import type { Menu, OrderItem } from "@/lib/types";
 
 export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
   const [name, setName] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [status, setStatus] = useState<PaymentStatus>("none");
+  const [requestNote, setRequestNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -49,13 +45,15 @@ export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
       phoneLast4,
       items,
       totalAmount: total,
-      paymentStatus: status,
+      paymentStatus: "none",
       isAdminForced: true,
+      requestNote: requestNote.trim(),
     });
     setSaving(false);
     setName("");
     setPhoneLast4("");
     setQuantities({});
+    setRequestNote("");
     setMessage("등록되었습니다. (다른 주문과 동일하게 마감 시간 전까지 수정/삭제 가능합니다)");
   }
 
@@ -90,18 +88,21 @@ export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
       </div>
 
       <div>
-        <label className="mb-1 block text-sm text-stone-900">입금 상태</label>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as PaymentStatus)}
-          className="rounded-md border border-stone-300 px-3 py-2 text-sm"
-        >
-          {STATUS_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+        <label htmlFor="forced-request-note" className="mb-1 block text-sm text-stone-900">
+          추가 요청 사항
+        </label>
+        <input
+          id="forced-request-note"
+          type="text"
+          maxLength={REQUEST_NOTE_MAX_LENGTH}
+          placeholder="ex: 김밥에 계란 빼주세요."
+          value={requestNote}
+          onChange={(e) => setRequestNote(e.target.value)}
+          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+        />
+        <p className="mt-1 text-right text-xs text-stone-500">
+          {requestNote.length}/{REQUEST_NOTE_MAX_LENGTH}
+        </p>
       </div>
 
       {message && <p className="text-sm text-stone-900">{message}</p>}
