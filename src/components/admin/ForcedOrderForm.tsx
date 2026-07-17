@@ -18,6 +18,11 @@ export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
+  const sortedMenus = useMemo(
+    () => [...menus].sort((a, b) => a.name.localeCompare(b.name, "ko")),
+    [menus]
+  );
+
   const items: OrderItem[] = useMemo(
     () =>
       menus
@@ -77,7 +82,7 @@ export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
         />
       </div>
 
-      <MenuQuantitySelector menus={menus} quantities={quantities} onChange={(id, qty) => setQuantities((q) => ({ ...q, [id]: qty }))} />
+      <MenuQuantitySelector menus={sortedMenus} quantities={quantities} onChange={(id, qty) => setQuantities((q) => ({ ...q, [id]: qty }))} />
 
       <div className="flex items-center justify-between rounded-lg bg-amber-100 px-4 py-3 font-medium">
         <span>총 주문 금액</span>
