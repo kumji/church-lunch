@@ -48,4 +48,26 @@ describe("NewOrderView 신규 주문", () => {
     expect(screen.getByRole("button", { name: "주문 완료" })).toBeDisabled();
     expect(createOrder).not.toHaveBeenCalled();
   });
+
+  it("메뉴 목록이 이름 가나다 오름차순으로 정렬되어 보인다", () => {
+    const unsortedMenus: Menu[] = [
+      { id: "m1", name: "라면", price: 4000, imgUrl: "" },
+      { id: "m2", name: "김밥", price: 3000, imgUrl: "" },
+      { id: "m3", name: "떡볶이", price: 5000, imgUrl: "" },
+    ];
+    render(
+      <NewOrderView
+        identity={identity}
+        menus={unsortedMenus}
+        bankInfo={bankInfo}
+        deadline={null}
+        onCreated={vi.fn()}
+      />
+    );
+
+    const items = screen.getAllByRole("listitem").map((li) => li.textContent);
+    expect(items[0]).toContain("김밥");
+    expect(items[1]).toContain("떡볶이");
+    expect(items[2]).toContain("라면");
+  });
 });

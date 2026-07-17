@@ -20,6 +20,11 @@ export default function NewOrderView({ identity, menus, bankInfo, deadline, onCr
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  const sortedMenus = useMemo(
+    () => [...menus].sort((a, b) => a.name.localeCompare(b.name, "ko")),
+    [menus]
+  );
+
   const items: OrderItem[] = useMemo(
     () =>
       menus
@@ -70,9 +75,9 @@ export default function NewOrderView({ identity, menus, bankInfo, deadline, onCr
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 p-4">
       <h2 className="text-lg font-semibold">메뉴 선택</h2>
-      <MenuQuantitySelector menus={menus} quantities={quantities} onChange={(id, qty) => setQuantities((q) => ({ ...q, [id]: qty }))} />
+      <MenuQuantitySelector menus={sortedMenus} quantities={quantities} onChange={(id, qty) => setQuantities((q) => ({ ...q, [id]: qty }))} />
 
-      {menus.length > 0 && (
+      {sortedMenus.length > 0 && (
         <>
           <div className="flex items-center justify-between rounded-lg bg-amber-100 px-4 py-3 font-medium">
             <span>총 주문 금액</span>
