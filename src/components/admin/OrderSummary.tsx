@@ -115,6 +115,7 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
                 <tr>
                   <th className="px-3 py-2 font-medium">주문자명</th>
                   <th className="px-3 py-2 font-medium">주문한 메뉴</th>
+                  <th className="px-3 py-2 font-medium">추가요청사항</th>
                   <th className="px-3 py-2 text-right font-medium">총금액</th>
                   <th className="px-3 py-2 text-center font-medium">입금여부</th>
                 </tr>
@@ -130,6 +131,7 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
                       <td className="px-3 py-2">
                         {items.map((item) => `${item.menuName} x${item.qty}`).join(", ")}
                       </td>
+                      <td className="px-3 py-2 font-medium text-red-600">{order.requestNote}</td>
                       <td className="px-3 py-2 text-right">
                         {subtotal.toLocaleString()}원
                         {diff !== null && (

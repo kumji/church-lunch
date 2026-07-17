@@ -78,4 +78,16 @@ describe("OrderSummary 주문 현황", () => {
     expect(rows[0]).toHaveTextContent("X");
     expect(rows[1]).toHaveTextContent("O");
   });
+
+  it("추가요청사항이 있으면 주문 내역에 빨간 글씨로 표시된다", () => {
+    const item = { menuId: "m1", menuName: "김밥", price: 3000, qty: 1 };
+    const withNote: Order[] = [
+      makeOrder({ id: "o1", name: "가영", items: [item], totalAmount: 3000, requestNote: "계란 빼주세요" }),
+    ];
+    render(<OrderSummary orders={withNote} />);
+
+    const note = screen.getByText("계란 빼주세요");
+    expect(note).toBeInTheDocument();
+    expect(note).toHaveClass("text-red-600");
+  });
 });
