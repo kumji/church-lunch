@@ -35,6 +35,7 @@ describe("NewOrderView 신규 주문", () => {
         totalAmount: 3000,
         paymentStatus: "none",
         isAdminForced: false,
+        requestNote: "",
       });
       expect(onCreated).toHaveBeenCalled();
     });
@@ -47,6 +48,32 @@ describe("NewOrderView 신규 주문", () => {
 
     expect(screen.getByRole("button", { name: "주문 완료" })).toBeDisabled();
     expect(createOrder).not.toHaveBeenCalled();
+  });
+
+  it("추가 요청 사항을 입력하면 주문에 함께 담겨 저장된다", async () => {
+    render(
+      <NewOrderView identity={identity} menus={menus} bankInfo={bankInfo} deadline={null} onCreated={vi.fn()} />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "+" }));
+    fireEvent.change(screen.getByLabelText("추가 요청 사항"), {
+      target: { value: "김밥에 계란 빼주세요" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "주문 완료" }));
+
+    await waitFor(() => {
+      expect(createOrder).toHaveBeenCalledWith(
+        expect.objectContaining({ requestNote: "김밥에 계란 빼주세요" })
+      );
+    });
+  });
+
+  it("추가 요청 사항 입력칸은 최대 25자까지만 입력할 수 있다", () => {
+    render(
+      <NewOrderView identity={identity} menus={menus} bankInfo={bankInfo} deadline={null} onCreated={vi.fn()} />
+    );
+
+    expect(screen.getByLabelText("추가 요청 사항")).toHaveAttribute("maxLength", "25");
   });
 
   it("메뉴 목록이 이름 가나다 오름차순으로 정렬되어 보인다", () => {

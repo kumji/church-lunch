@@ -1,3 +1,5 @@
+export const REQUEST_NOTE_MAX_LENGTH = 25;
+
 export type PaymentStatus = "none" | "confirmed";
 
 export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
@@ -24,6 +26,8 @@ export interface Order {
   paymentStatus: PaymentStatus;
   isAdminForced: boolean;
   createdAt?: number;
+  // 주문 시 남긴 추가 요청 사항 (최대 25자). 없으면 빈 문자열이거나 필드 자체가 없다.
+  requestNote?: string;
 }
 
 export type NewOrder = Omit<Order, "id" | "createdAt">;

@@ -64,11 +64,13 @@ export async function createOrder(order: NewOrder): Promise<string> {
 
 export async function updateOrderItems(
   orderId: string,
-  items: OrderItem[]
+  items: OrderItem[],
+  requestNote: string
 ): Promise<void> {
   await updateDoc(doc(db, "orders", orderId), {
     items,
     totalAmount: calcTotal(items),
+    requestNote,
   });
 }
 

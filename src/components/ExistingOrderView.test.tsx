@@ -48,10 +48,53 @@ describe("ExistingOrderView 주문 수정/삭제", () => {
     fireEvent.click(screen.getByRole("button", { name: "저장" }));
 
     await waitFor(() => {
-      expect(updateOrderItems).toHaveBeenCalledWith("o1", [
-        { menuId: "m1", menuName: "김밥", price: 3000, qty: 2 },
-      ]);
+      expect(updateOrderItems).toHaveBeenCalledWith(
+        "o1",
+        [{ menuId: "m1", menuName: "김밥", price: 3000, qty: 2 }],
+        ""
+      );
       expect(onChanged).toHaveBeenCalled();
+    });
+  });
+
+  it("추가 요청 사항이 있으면 주문 내역에 표시된다", () => {
+    render(
+      <ExistingOrderView
+        order={{ ...makeOrder(), requestNote: "김밥에 계란 빼주세요" }}
+        menus={menus}
+        bankInfo={bankInfo}
+        deadline={null}
+        onChanged={vi.fn()}
+        onDeleted={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("김밥에 계란 빼주세요")).toBeInTheDocument();
+  });
+
+  it("추가 요청 사항을 수정하거나 지울 수 있다", async () => {
+    const onChanged = vi.fn();
+    render(
+      <ExistingOrderView
+        order={{ ...makeOrder(), requestNote: "김밥에 계란 빼주세요" }}
+        menus={menus}
+        bankInfo={bankInfo}
+        deadline={null}
+        onChanged={onChanged}
+        onDeleted={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "수정" }));
+    fireEvent.change(screen.getByLabelText("추가 요청 사항"), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: "저장" }));
+
+    await waitFor(() => {
+      expect(updateOrderItems).toHaveBeenCalledWith(
+        "o1",
+        [{ menuId: "m1", menuName: "김밥", price: 3000, qty: 1 }],
+        ""
+      );
     });
   });
 

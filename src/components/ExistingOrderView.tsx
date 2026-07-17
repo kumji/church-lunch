@@ -5,7 +5,7 @@ import MenuQuantitySelector from "./MenuQuantitySelector";
 import BankInfoCard from "./BankInfoCard";
 import { calcTotal, deleteOrder, updateOrderItems } from "@/lib/orders";
 import { isPastDeadline } from "@/lib/time";
-import { PAYMENT_STATUS_LABEL } from "@/lib/types";
+import { PAYMENT_STATUS_LABEL, REQUEST_NOTE_MAX_LENGTH } from "@/lib/types";
 import type { BankInfo, Menu, Order, OrderItem } from "@/lib/types";
 
 interface Props {
@@ -22,6 +22,7 @@ export default function ExistingOrderView({ order, menus, bankInfo, deadline, on
   const [quantities, setQuantities] = useState<Record<string, number>>(() =>
     Object.fromEntries(order.items.map((i) => [i.menuId, i.qty]))
   );
+  const [requestNote, setRequestNote] = useState(order.requestNote ?? "");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -44,7 +45,7 @@ export default function ExistingOrderView({ order, menus, bankInfo, deadline, on
       return;
     }
     setBusy(true);
-    await updateOrderItems(order.id, editItems);
+    await updateOrderItems(order.id, editItems, requestNote.trim());
     setBusy(false);
     setEditing(false);
     onChanged();
@@ -72,6 +73,23 @@ export default function ExistingOrderView({ order, menus, bankInfo, deadline, on
         <div className="flex items-center justify-between rounded-lg bg-amber-100 px-4 py-3 font-medium">
           <span>총 주문 금액</span>
           <span>{editTotal.toLocaleString()}원</span>
+        </div>
+        <div>
+          <label htmlFor="edit-request-note" className="mb-1 block text-sm text-stone-900">
+            추가 요청 사항
+          </label>
+          <input
+            id="edit-request-note"
+            type="text"
+            maxLength={REQUEST_NOTE_MAX_LENGTH}
+            placeholder="ex: 김밥에 계란 빼주세요."
+            value={requestNote}
+            onChange={(e) => setRequestNote(e.target.value)}
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+          />
+          <p className="mt-1 text-right text-xs text-stone-500">
+            {requestNote.length}/{REQUEST_NOTE_MAX_LENGTH}
+          </p>
         </div>
         {notice && <p className="text-sm text-red-600">{notice}</p>}
         <div className="flex gap-3">
@@ -117,6 +135,11 @@ export default function ExistingOrderView({ order, menus, bankInfo, deadline, on
         <div className="mt-2 text-sm text-stone-900">
           입금 상태: <span className="font-medium text-stone-900">{PAYMENT_STATUS_LABEL[order.paymentStatus]}</span>
         </div>
+        {order.requestNote && (
+          <div className="mt-2 text-sm text-stone-900">
+            추가 요청 사항: <span className="font-medium text-stone-900">{order.requestNote}</span>
+          </div>
+        )}
       </div>
 
       <BankInfoCard bankInfo={bankInfo} />

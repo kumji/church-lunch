@@ -5,6 +5,7 @@ import MenuQuantitySelector from "./MenuQuantitySelector";
 import BankInfoCard from "./BankInfoCard";
 import { calcTotal, createOrder } from "@/lib/orders";
 import { isPastDeadline } from "@/lib/time";
+import { REQUEST_NOTE_MAX_LENGTH } from "@/lib/types";
 import type { BankInfo, Identity, Menu, OrderItem } from "@/lib/types";
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
 
 export default function NewOrderView({ identity, menus, bankInfo, deadline, onCreated }: Props) {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [requestNote, setRequestNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -64,6 +66,7 @@ export default function NewOrderView({ identity, menus, bankInfo, deadline, onCr
         totalAmount: total,
         paymentStatus: "none",
         isAdminForced: false,
+        requestNote: requestNote.trim(),
       });
       onCreated();
     } catch {
@@ -82,6 +85,24 @@ export default function NewOrderView({ identity, menus, bankInfo, deadline, onCr
           <div className="flex items-center justify-between rounded-lg bg-amber-100 px-4 py-3 font-medium">
             <span>총 주문 금액</span>
             <span>{total.toLocaleString()}원</span>
+          </div>
+
+          <div>
+            <label htmlFor="request-note" className="mb-1 block text-sm text-stone-900">
+              추가 요청 사항
+            </label>
+            <input
+              id="request-note"
+              type="text"
+              maxLength={REQUEST_NOTE_MAX_LENGTH}
+              placeholder="ex: 김밥에 계란 빼주세요."
+              value={requestNote}
+              onChange={(e) => setRequestNote(e.target.value)}
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+            />
+            <p className="mt-1 text-right text-xs text-stone-500">
+              {requestNote.length}/{REQUEST_NOTE_MAX_LENGTH}
+            </p>
           </div>
 
           <BankInfoCard bankInfo={bankInfo} />
