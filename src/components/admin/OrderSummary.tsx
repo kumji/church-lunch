@@ -71,8 +71,8 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
         ) : (
           <ul className="flex flex-col gap-1">
             {sortedMenuStats.map(([name, stat]) => (
-              <li key={name} className="text-2xl font-bold">
-                {name}: {stat.qty}
+              <li key={name} className="text-xl font-bold">
+                {name}: {stat.qty} 개
               </li>
             ))}
           </ul>
