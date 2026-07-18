@@ -26,6 +26,7 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
       });
     }
   }
+  const sortedMenuStats = [...menuStats.entries()].sort(([a], [b]) => a.localeCompare(b, "ko"));
 
   function toggleMenu(name: string) {
     setUncheckedMenus((prev) => {
@@ -64,13 +65,28 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
       </div>
 
       <div className="rounded-lg border border-stone-200 p-4">
+        <p className="mb-2 text-sm text-stone-900">메뉴별 주문 완료 수량</p>
+        {sortedMenuStats.length === 0 ? (
+          <p className="text-sm text-stone-900">주문 내역이 없습니다.</p>
+        ) : (
+          <ul className="flex flex-col gap-1">
+            {sortedMenuStats.map(([name, stat]) => (
+              <li key={name} className="text-2xl font-bold">
+                {name}: {stat.qty}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="rounded-lg border border-stone-200 p-4">
         <p className="mb-2 text-sm text-stone-900">메뉴별 주문 수량</p>
-        {menuStats.size === 0 ? (
+        {sortedMenuStats.length === 0 ? (
           <p className="text-sm text-stone-900">주문 내역이 없습니다.</p>
         ) : (
           <>
             <ul className="divide-y divide-stone-100">
-              {[...menuStats.entries()].map(([name, stat]) => (
+              {sortedMenuStats.map(([name, stat]) => (
                 <li key={name} className="flex items-center gap-3 py-1.5 text-sm">
                   <input
                     type="checkbox"
