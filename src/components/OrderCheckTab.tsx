@@ -83,7 +83,9 @@ export default function OrderCheckTab({ menus, orders, bankInfo, deadline }: Pro
       )}
 
       <div className="rounded-lg border border-stone-200 p-4">
-        <p className="mb-3 text-sm text-stone-900">현재 메뉴별 주문 수량</p>
+        <p className="text-sm text-stone-900">주문 완료 인원수</p>
+        <p className="text-2xl font-bold">{orders.length}명</p>
+        <p className="mb-3 mt-4 text-sm text-stone-900">메뉴 별 주문 현황</p>
         <MenuOrderStats menus={menus} orders={orders} />
       </div>
     </div>
