@@ -69,6 +69,26 @@ describe("OrderCheckTab 내 주문 확인", () => {
     expect(findOrderByIdentity).not.toHaveBeenCalled();
   });
 
+  it("prefill이 주어지면 이름/번호를 자동으로 채우고 즉시 조회한다", async () => {
+    vi.mocked(findOrderByIdentity).mockResolvedValue(makeOrder());
+    render(
+      <OrderCheckTab
+        menus={menus}
+        orders={[]}
+        bankInfo={bankInfo}
+        deadline={null}
+        prefill={{ name: "홍길동", phoneLast4: "1234" }}
+      />
+    );
+
+    await waitFor(() => {
+      expect(findOrderByIdentity).toHaveBeenCalledWith("홍길동", "1234");
+      expect(screen.getByText("주문 내역")).toBeInTheDocument();
+    });
+    expect(screen.getByPlaceholderText("이름")).toHaveValue("홍길동");
+    expect(screen.getByPlaceholderText("0000")).toHaveValue("1234");
+  });
+
   it("메뉴별 주문 수량을 메뉴명 오름차순으로 보여준다", () => {
     const orders: Order[] = [
       { ...makeOrder(), items: [{ menuId: "m1", menuName: "라면", price: 4000, qty: 2 }] },

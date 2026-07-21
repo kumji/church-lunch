@@ -132,9 +132,7 @@ export default function ExistingOrderView({ order, menus, bankInfo, deadline, on
           <span>총 주문 금액</span>
           <span>{order.totalAmount.toLocaleString()}원</span>
         </div>
-        <div className="mt-2 text-sm text-stone-900">
-          입금 상태: <span className="font-medium text-stone-900">{PAYMENT_STATUS_LABEL[order.paymentStatus]}</span>
-        </div>
+   
         {order.requestNote && (
           <div className="mt-2 text-sm text-stone-900">
             추가 요청 사항: <span className="font-medium text-stone-900">{order.requestNote}</span>

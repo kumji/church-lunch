@@ -7,7 +7,7 @@ import { calcTotal, createOrder, findOrderByIdentity, menuQtyByMenuId } from "@/
 import { isPastDeadline } from "@/lib/time";
 import { validateEntryForm } from "@/lib/validation";
 import { REQUEST_NOTE_MAX_LENGTH } from "@/lib/types";
-import type { BankInfo, Menu, Order, OrderItem } from "@/lib/types";
+import type { BankInfo, Identity, Menu, Order, OrderItem } from "@/lib/types";
 
 const MIN_ORDERS_FOR_RANKING = 5;
 
@@ -16,7 +16,7 @@ interface Props {
   orders: Order[];
   bankInfo: BankInfo;
   deadline: string | null;
-  onCreated: () => void;
+  onCreated: (identity: Identity) => void;
 }
 
 export default function NewOrderView({ menus, orders, bankInfo, deadline, onCreated }: Props) {
@@ -96,7 +96,7 @@ export default function NewOrderView({ menus, orders, bankInfo, deadline, onCrea
         isAdminForced: false,
         requestNote: requestNote.trim(),
       });
-      onCreated();
+      onCreated({ name: name.trim(), phoneLast4 });
     } catch {
       setError("주문 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
       setSubmitting(false);

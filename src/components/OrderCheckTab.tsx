@@ -1,38 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExistingOrderView from "./ExistingOrderView";
 import MenuOrderStats from "./MenuOrderStats";
 import { findOrderByIdentity } from "@/lib/orders";
 import { validateEntryForm } from "@/lib/validation";
-import type { BankInfo, Menu, Order } from "@/lib/types";
+import type { BankInfo, Identity, Menu, Order } from "@/lib/types";
 
 interface Props {
   menus: Menu[];
   orders: Order[];
   bankInfo: BankInfo;
   deadline: string | null;
+  prefill?: Identity | null;
 }
 
-export default function OrderCheckTab({ menus, orders, bankInfo, deadline }: Props) {
+export default function OrderCheckTab({ menus, orders, bankInfo, deadline, prefill }: Props) {
   const [name, setName] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(false);
   const [order, setOrder] = useState<Order | null | undefined>(undefined);
 
-  async function handleCheck() {
-    const validationError = validateEntryForm(name, phoneLast4);
+  async function checkIdentity(checkName: string, checkPhoneLast4: string) {
+    const validationError = validateEntryForm(checkName, checkPhoneLast4);
     if (validationError) {
       setError(validationError);
       return;
     }
     setChecking(true);
     setError("");
-    const found = await findOrderByIdentity(name.trim(), phoneLast4);
+    const found = await findOrderByIdentity(checkName.trim(), checkPhoneLast4);
     setOrder(found);
     setChecking(false);
   }
+
+  function handleCheck() {
+    checkIdentity(name, phoneLast4);
+  }
+
+  useEffect(() => {
+    if (!prefill) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 방금 생성된 주문의 이름/번호를 자동으로 채우고 바로 조회한다
+    setName(prefill.name);
+    setPhoneLast4(prefill.phoneLast4);
+    checkIdentity(prefill.name, prefill.phoneLast4);
+  }, [prefill]);
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 p-4">

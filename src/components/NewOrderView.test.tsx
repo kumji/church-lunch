@@ -43,7 +43,7 @@ describe("NewOrderView 신규 주문", () => {
         isAdminForced: false,
         requestNote: "",
       });
-      expect(onCreated).toHaveBeenCalled();
+      expect(onCreated).toHaveBeenCalledWith({ name: "홍길동", phoneLast4: "1234" });
     });
   });
 

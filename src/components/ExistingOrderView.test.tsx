@@ -60,7 +60,7 @@ describe("ExistingOrderView 주문 수정/삭제", () => {
   it("추가 요청 사항이 있으면 주문 내역에 표시된다", () => {
     render(
       <ExistingOrderView
-        order={{ ...makeOrder(), requestNote: "김밥에 계란 빼주세요" }}
+        order={{ ...makeOrder(), requestNote: "주문한 김밥 중 1줄은 계란 빼주세요." }}
         menus={menus}
         bankInfo={bankInfo}
         deadline={null}
@@ -69,7 +69,7 @@ describe("ExistingOrderView 주문 수정/삭제", () => {
       />
     );
 
-    expect(screen.getByText("김밥에 계란 빼주세요")).toBeInTheDocument();
+    expect(screen.getByText("주문한 김밥 중 1줄은 계란 빼주세요.")).toBeInTheDocument();
   });
 
   it("추가 요청 사항을 수정하거나 지울 수 있다", async () => {

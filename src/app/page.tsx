@@ -8,7 +8,7 @@ import OrderCheckTab from "@/components/OrderCheckTab";
 import { subscribeMenus } from "@/lib/menus";
 import { subscribeConfig } from "@/lib/settings";
 import { subscribeOrders } from "@/lib/orders";
-import type { Config, Menu, Order } from "@/lib/types";
+import type { Config, Identity, Menu, Order } from "@/lib/types";
 
 type Tab = "menu" | "check";
 
@@ -18,6 +18,7 @@ export default function HomePage() {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [config, setConfig] = useState<Config | null>(null);
+  const [checkPrefill, setCheckPrefill] = useState<Identity | null>(null);
 
   useEffect(() => {
     const unsubMenus = subscribeMenus(setMenus);
@@ -74,10 +75,19 @@ export default function HomePage() {
           orders={orders}
           bankInfo={bankInfo}
           deadline={deadline}
-          onCreated={() => setTab("check")}
+          onCreated={(identity) => {
+            setCheckPrefill(identity);
+            setTab("check");
+          }}
         />
       ) : (
-        <OrderCheckTab menus={menus} orders={orders} bankInfo={bankInfo} deadline={deadline} />
+        <OrderCheckTab
+          menus={menus}
+          orders={orders}
+          bankInfo={bankInfo}
+          deadline={deadline}
+          prefill={checkPrefill}
+        />
       )}
     </div>
   );
