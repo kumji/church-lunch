@@ -22,6 +22,16 @@ export function calcTotal(items: OrderItem[]): number {
   return items.reduce((sum, item) => sum + item.price * item.qty, 0);
 }
 
+export function menuQtyByMenuId(orders: Order[]): Map<string, number> {
+  const qtyByMenuId = new Map<string, number>();
+  for (const order of orders) {
+    for (const item of order.items) {
+      qtyByMenuId.set(item.menuId, (qtyByMenuId.get(item.menuId) ?? 0) + item.qty);
+    }
+  }
+  return qtyByMenuId;
+}
+
 // 입금 확인 이후 메뉴 가격이 바뀌어 totalAmount가 재계산된 경우의 차익.
 // 아직 confirmedAmount가 없거나(미입금) 차익이 없으면 null.
 export function amountDiff(order: Order): number | null {

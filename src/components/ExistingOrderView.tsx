@@ -60,9 +60,9 @@ export default function ExistingOrderView({ order, menus, bankInfo, deadline, on
   }
 
   const lockMessage = closed
-    ? "마감 시간이 지났습니다. 담당자에게 연락주세요."
+    ? "마감 시간이 지났습니다. 담당자에게 문의해주세요."
     : lockedByStatus
-    ? "입금 확인 절차가 진행 중이거나 완료되어 수정이 불가합니다. 담당자에게 문의해주세요."
+    ? "입금 확인 완료되어 수정이 불가합니다. 담당자에게 문의해주세요."
     : "";
 
   if (editing) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { amountDiff, calcTotal } from "./orders";
+import { amountDiff, calcTotal, menuQtyByMenuId } from "./orders";
 import type { Order, OrderItem } from "./types";
 
 function makeOrder(overrides: Partial<Order> = {}): Order {
@@ -48,5 +48,27 @@ describe("amountDiff", () => {
   it("가격 인하로 totalAmount가 줄어들면 음수 차익을 반환한다", () => {
     const order = makeOrder({ totalAmount: 9000, confirmedAmount: 10000 });
     expect(amountDiff(order)).toBe(-1000);
+  });
+});
+
+describe("menuQtyByMenuId", () => {
+  it("여러 주문에 걸친 메뉴별 수량을 menuId 기준으로 합산한다", () => {
+    const orders: Order[] = [
+      makeOrder({
+        items: [
+          { menuId: "m1", menuName: "김밥", price: 3000, qty: 2 },
+          { menuId: "m2", menuName: "라면", price: 4000, qty: 1 },
+        ],
+      }),
+      makeOrder({ items: [{ menuId: "m1", menuName: "김밥", price: 3000, qty: 1 }] }),
+    ];
+
+    const result = menuQtyByMenuId(orders);
+    expect(result.get("m1")).toBe(3);
+    expect(result.get("m2")).toBe(1);
+  });
+
+  it("주문이 없으면 빈 Map을 반환한다", () => {
+    expect(menuQtyByMenuId([]).size).toBe(0);
   });
 });

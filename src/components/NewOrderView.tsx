@@ -3,20 +3,25 @@
 import { useMemo, useState } from "react";
 import MenuQuantitySelector from "./MenuQuantitySelector";
 import BankInfoCard from "./BankInfoCard";
-import { calcTotal, createOrder } from "@/lib/orders";
+import { calcTotal, createOrder, findOrderByIdentity, menuQtyByMenuId } from "@/lib/orders";
 import { isPastDeadline } from "@/lib/time";
+import { validateEntryForm } from "@/lib/validation";
 import { REQUEST_NOTE_MAX_LENGTH } from "@/lib/types";
-import type { BankInfo, Identity, Menu, OrderItem } from "@/lib/types";
+import type { BankInfo, Menu, Order, OrderItem } from "@/lib/types";
+
+const MIN_ORDERS_FOR_RANKING = 5;
 
 interface Props {
-  identity: Identity;
   menus: Menu[];
+  orders: Order[];
   bankInfo: BankInfo;
   deadline: string | null;
   onCreated: () => void;
 }
 
-export default function NewOrderView({ identity, menus, bankInfo, deadline, onCreated }: Props) {
+export default function NewOrderView({ menus, orders, bankInfo, deadline, onCreated }: Props) {
+  const [name, setName] = useState("");
+  const [phoneLast4, setPhoneLast4] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [requestNote, setRequestNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -26,6 +31,18 @@ export default function NewOrderView({ identity, menus, bankInfo, deadline, onCr
     () => [...menus].sort((a, b) => a.name.localeCompare(b.name, "ko")),
     [menus]
   );
+
+  const rankByMenuId = useMemo(() => {
+    if (orders.length < MIN_ORDERS_FOR_RANKING) return undefined;
+    const qtyByMenuId = menuQtyByMenuId(orders);
+    const ranked = [...qtyByMenuId.entries()]
+      .filter(([, qty]) => qty > 0)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 2);
+    const map = new Map<string, 1 | 2>();
+    ranked.forEach(([menuId], i) => map.set(menuId, (i + 1) as 1 | 2));
+    return map;
+  }, [orders]);
 
   const items: OrderItem[] = useMemo(
     () =>
@@ -56,12 +73,23 @@ export default function NewOrderView({ identity, menus, bankInfo, deadline, onCr
       setError("메뉴를 1개 이상 선택해주세요.");
       return;
     }
+    const validationError = validateEntryForm(name, phoneLast4);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setSubmitting(true);
     setError("");
     try {
+      const existing = await findOrderByIdentity(name.trim(), phoneLast4);
+      if (existing) {
+        setError("이미 등록된 주문이 있습니다. '주문 확인' 탭에서 확인해주세요.");
+        setSubmitting(false);
+        return;
+      }
       await createOrder({
-        name: identity.name,
-        phoneLast4: identity.phoneLast4,
+        name: name.trim(),
+        phoneLast4,
         items,
         totalAmount: total,
         paymentStatus: "none",
@@ -77,8 +105,12 @@ export default function NewOrderView({ identity, menus, bankInfo, deadline, onCr
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 p-4">
-      <h2 className="text-lg font-semibold">메뉴 선택</h2>
-      <MenuQuantitySelector menus={sortedMenus} quantities={quantities} onChange={(id, qty) => setQuantities((q) => ({ ...q, [id]: qty }))} />
+      <MenuQuantitySelector
+        menus={sortedMenus}
+        quantities={quantities}
+        onChange={(id, qty) => setQuantities((q) => ({ ...q, [id]: qty }))}
+        rankByMenuId={rankByMenuId}
+      />
 
       {sortedMenus.length > 0 && (
         <>
@@ -106,6 +138,25 @@ export default function NewOrderView({ identity, menus, bankInfo, deadline, onCr
           </div>
 
           <BankInfoCard bankInfo={bankInfo} />
+
+          <div className="flex gap-3">
+            <input
+              type="text"
+              placeholder="이름"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="h-12 flex-1 rounded-lg border-2 border-stone-300 px-3 text-center font-medium outline-none focus:border-stone-500"
+            />
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={4}
+              placeholder="0000"
+              value={phoneLast4}
+              onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
+              className="h-12 w-28 rounded-lg border-2 border-stone-300 px-3 text-center font-medium tracking-[0.3em] outline-none focus:border-stone-500"
+            />
+          </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 

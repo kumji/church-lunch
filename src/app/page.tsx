@@ -1,102 +1,84 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import CountdownTimer from "@/components/CountdownTimer";
-import { saveIdentity } from "@/lib/session";
+import NewOrderView from "@/components/NewOrderView";
+import OrderCheckTab from "@/components/OrderCheckTab";
+import { subscribeMenus } from "@/lib/menus";
 import { subscribeConfig } from "@/lib/settings";
-import { isPastDeadline } from "@/lib/time";
-import { validateEntryForm } from "@/lib/validation";
+import { subscribeOrders } from "@/lib/orders";
+import type { Config, Menu, Order } from "@/lib/types";
 
-export default function EntryPage() {
+type Tab = "menu" | "check";
+
+export default function HomePage() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [phoneLast4, setPhoneLast4] = useState("");
-  const [error, setError] = useState("");
-  const [closed, setClosed] = useState(false);
-  const [deadline, setDeadline] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>("menu");
+  const [menus, setMenus] = useState<Menu[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [config, setConfig] = useState<Config | null>(null);
 
   useEffect(() => {
-    const unsub = subscribeConfig((config) => {
-      setClosed(config?.deadline ? isPastDeadline(config.deadline) : false);
-      setDeadline(config?.deadline || null);
-    });
-    return unsub;
+    const unsubMenus = subscribeMenus(setMenus);
+    const unsubOrders = subscribeOrders(setOrders);
+    const unsubConfig = subscribeConfig(setConfig);
+    return () => {
+      unsubMenus();
+      unsubOrders();
+      unsubConfig();
+    };
   }, []);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const validationError = validateEntryForm(name, phoneLast4);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    saveIdentity({ name: name.trim(), phoneLast4 });
-    router.push("/order");
-  }
+  const bankInfo = config?.bankInfo ?? { bankName: "", accountNumber: "", accountHolder: "" };
+  const deadline = config?.deadline || null;
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-amber-50">
+    <div className="min-h-screen bg-amber-50">
       <CountdownTimer deadline={deadline} />
-      <div className="flex w-full flex-1 flex-col items-center justify-center px-4">
-        <div className="w-full max-w-sm rounded-xl bg-white p-8 shadow-sm">
-          <div className="mb-4 flex justify-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
-              <svg viewBox="0 0 24 24" className="h-7 w-7 text-amber-700" fill="currentColor" aria-hidden="true">
-                <path d="M11 2h2v7h7v2h-7v11h-2V11H4V9h7V2z" />
-              </svg>
-            </div>
-          </div>
-          <p className="mb-1 text-center text-sm font-medium text-amber-800">광림교회 청장2부</p>
-          <h1 className="mb-1 text-center text-2xl font-bold">애찬 주문</h1>
-          <p className="mb-6 text-center text-base text-stone-900">
-            이름과 휴대폰 번호 뒷자리 4자리를 입력해주세요.
-          </p>
 
-          {closed && (
-            <p className="mb-4 text-center text-sm font-medium text-red-600">
-              마감 시간이 지나 신규 주문은 불가하며, 본인 주문 내역 확인만 가능합니다.
-            </p>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex flex-col items-center gap-3">
-            <input
-              type="text"
-              placeholder="이름"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="h-14 w-48 rounded-lg border-2 border-stone-300 px-4 text-center text-lg font-medium outline-none focus:border-stone-500"
-            />
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={4}
-              placeholder="0000"
-              value={phoneLast4}
-              onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
-              className="h-14 w-48 rounded-lg border-2 border-stone-300 px-4 text-center text-lg font-medium tracking-[0.3em] outline-none focus:border-stone-500"
-            />
-
-            {error && <p className="text-sm text-red-600">{error}</p>}
-
-            <button
-              type="submit"
-              className="mt-2 flex h-14 w-48 items-center justify-center rounded-lg bg-amber-700 text-lg font-medium text-white hover:bg-amber-800"
-            >
-              확인
-            </button>
-          </form>
-
-          <button
-            type="button"
-            onClick={() => router.push("/admin")}
-            className="mt-6 w-full text-center text-base text-stone-900 hover:text-stone-600"
-          >
-            관리자 모드
-          </button>
-        </div>
+      <div className="flex justify-end px-4 pt-3">
+        <button
+          onClick={() => router.push("/admin")}
+          className="text-xs text-stone-500 hover:text-stone-700"
+        >
+          Admin
+        </button>
       </div>
+
+      <p className="px-4 text-center text-sm font-medium text-amber-800">광림교회 청장2부</p>
+      <h1 className="px-4 pb-3 text-center text-xl font-bold">애찬 주문</h1>
+
+      <div className="mx-auto flex max-w-md gap-2 px-4">
+        <button
+          onClick={() => setTab("menu")}
+          className={`flex-1 rounded-md px-3 py-2 text-sm font-medium ${
+            tab === "menu" ? "bg-amber-700 text-white" : "border border-stone-300 bg-white text-stone-900"
+          }`}
+        >
+          메뉴 선택
+        </button>
+        <button
+          onClick={() => setTab("check")}
+          className={`flex-1 rounded-md px-3 py-2 text-sm font-medium ${
+            tab === "check" ? "bg-amber-700 text-white" : "border border-stone-300 bg-white text-stone-900"
+          }`}
+        >
+          주문 확인
+        </button>
+      </div>
+
+      {tab === "menu" ? (
+        <NewOrderView
+          menus={menus}
+          orders={orders}
+          bankInfo={bankInfo}
+          deadline={deadline}
+          onCreated={() => setTab("check")}
+        />
+      ) : (
+        <OrderCheckTab menus={menus} orders={orders} bankInfo={bankInfo} deadline={deadline} />
+      )}
     </div>
   );
 }
