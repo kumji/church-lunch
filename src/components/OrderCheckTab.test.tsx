@@ -40,7 +40,7 @@ describe("OrderCheckTab 내 주문 확인", () => {
     vi.mocked(findOrderByIdentity).mockResolvedValue(makeOrder());
     render(<OrderCheckTab menus={menus} orders={[]} bankInfo={bankInfo} deadline={null} />);
 
-    checkOrder("홍길동", "1234");
+    checkOrder("홍길동");
 
     await waitFor(() => {
       expect(screen.getByText("주문 내역")).toBeInTheDocument();
@@ -51,7 +51,7 @@ describe("OrderCheckTab 내 주문 확인", () => {
     vi.mocked(findOrderByIdentity).mockResolvedValue(null);
     render(<OrderCheckTab menus={menus} orders={[]} bankInfo={bankInfo} deadline={null} />);
 
-    checkOrder("홍길동", "9999");
+    checkOrder("홍길동");
 
     await waitFor(() => {
       expect(screen.getByText("해당 이름과 번호로 등록된 주문이 없습니다.")).toBeInTheDocument();
@@ -61,7 +61,7 @@ describe("OrderCheckTab 내 주문 확인", () => {
   it("이름/전화번호가 유효하지 않으면 에러를 보여주고 조회하지 않는다", () => {
     render(<OrderCheckTab menus={menus} orders={[]} bankInfo={bankInfo} deadline={null} />);
 
-    checkOrder("홍길동", "12");
+    checkOrder("홍길동");
 
     expect(screen.getByText("뒷자리를 정확하게 입력해주세요.")).toBeInTheDocument();
     expect(findOrderByIdentity).not.toHaveBeenCalled();

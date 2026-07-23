@@ -78,7 +78,7 @@ describe("NewOrderView 신규 주문", () => {
     render(<NewOrderView menus={menus} orders={[]} bankInfo={bankInfo} deadline={null} onCreated={vi.fn()} />);
 
     fireEvent.click(screen.getByRole("button", { name: "+" }));
-    fillIdentity("홍길동", "1234");
+    fillIdentity("홍길동");
     fireEvent.click(screen.getByRole("button", { name: "주문 완료" }));
 
     await waitFor(() => {
@@ -94,7 +94,7 @@ describe("NewOrderView 신규 주문", () => {
     fireEvent.change(screen.getByLabelText("추가 요청 사항"), {
       target: { value: "김밥에 계란 빼주세요" },
     });
-    fillIdentity("홍길동", "1234");
+    fillIdentity("홍길동");
     fireEvent.click(screen.getByRole("button", { name: "주문 완료" }));
 
     await waitFor(() => {

@@ -48,11 +48,10 @@ export default function OrderCheckTab({ menus, orders, bankInfo, deadline, prefi
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 p-4">
       <div className="rounded-lg border border-stone-200 p-4">
-        <h2 className="mb-3 text-lg font-semibold">내 주문 확인하기</h2>
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
+          <p className="font-semibold mb-1">주문자 성함</p>
           <input
             type="text"
-            placeholder="이름"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="h-12 flex-1 rounded-lg border-2 border-stone-300 px-3 text-center font-medium outline-none focus:border-stone-500"
