@@ -58,7 +58,7 @@ export default function PaymentManager({ orders }: { orders: Order[] }) {
                     <li key={order.id} className="flex items-center justify-between gap-3 py-2 text-sm">
                       <div>
                         <p>
-                          {order.name} ({order.phoneLast4}) · {order.totalAmount.toLocaleString()}원
+                          {order.name} · {order.totalAmount.toLocaleString()}원
                           {diff !== null && (
                             <span className="font-medium text-red-600">
                               {" "}

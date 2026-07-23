@@ -19,7 +19,6 @@ export function ordersToCsv(orders: Order[]): string {
     rows.push(
       [
         escapeCsvField(order.name),
-        escapeCsvField(order.phoneLast4),
         escapeCsvField(menuNames),
         escapeCsvField(qtys),
         escapeCsvField(order.totalAmount),

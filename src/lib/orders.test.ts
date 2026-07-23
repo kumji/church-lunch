@@ -6,7 +6,6 @@ function makeOrder(overrides: Partial<Order> = {}): Order {
   return {
     id: "order-1",
     name: "홍길동",
-    phoneLast4: "1234",
     items: [],
     totalAmount: 0,
     paymentStatus: "none",

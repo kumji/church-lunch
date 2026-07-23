@@ -142,7 +142,7 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
                   return (
                     <tr key={order.id}>
                       <td className="px-3 py-2">
-                        {order.name} ({order.phoneLast4})
+                        {order.name}
                       </td>
                       <td className="px-3 py-2">
                         {items.map((item) => `${item.menuName} x${item.qty}`).join(", ")}

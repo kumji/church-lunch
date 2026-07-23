@@ -18,7 +18,6 @@ function makeOrder(overrides: Partial<Order> = {}): Order {
   return {
     id: "o1",
     name: "홍길동",
-    phoneLast4: "1234",
     items: [{ menuId: "m1", menuName: "김밥", price: 3000, qty: 1 }],
     totalAmount: 3000,
     paymentStatus: "none",

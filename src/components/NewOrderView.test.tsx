@@ -12,9 +12,8 @@ vi.mock("@/lib/orders", async (importOriginal) => {
 const menus: Menu[] = [{ id: "m1", name: "김밥", price: 3000, imgUrl: "" }];
 const bankInfo = { bankName: "카카오뱅크", accountNumber: "1234567", accountHolder: "전지현" };
 
-function fillIdentity(name: string, phoneLast4: string) {
+function fillIdentity(name: string) {
   fireEvent.change(screen.getByPlaceholderText("이름"), { target: { value: name } });
-  fireEvent.change(screen.getByPlaceholderText("0000"), { target: { value: phoneLast4 } });
 }
 
 describe("NewOrderView 신규 주문", () => {
@@ -30,20 +29,19 @@ describe("NewOrderView 신규 주문", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "+" }));
-    fillIdentity("홍길동", "1234");
+    fillIdentity("홍길동");
     fireEvent.click(screen.getByRole("button", { name: "주문 완료" }));
 
     await waitFor(() => {
       expect(createOrder).toHaveBeenCalledWith({
         name: "홍길동",
-        phoneLast4: "1234",
         items: [{ menuId: "m1", menuName: "김밥", price: 3000, qty: 1 }],
         totalAmount: 3000,
         paymentStatus: "none",
         isAdminForced: false,
         requestNote: "",
       });
-      expect(onCreated).toHaveBeenCalledWith({ name: "홍길동", phoneLast4: "1234" });
+      expect(onCreated).toHaveBeenCalledWith({ name: "홍길동" });
     });
   });
 
@@ -58,7 +56,7 @@ describe("NewOrderView 신규 주문", () => {
     render(<NewOrderView menus={menus} orders={[]} bankInfo={bankInfo} deadline={null} onCreated={vi.fn()} />);
 
     fireEvent.click(screen.getByRole("button", { name: "+" }));
-    fillIdentity("홍길동", "12");
+    fillIdentity("홍길동");
     fireEvent.click(screen.getByRole("button", { name: "주문 완료" }));
 
     await waitFor(() => {
@@ -71,7 +69,6 @@ describe("NewOrderView 신규 주문", () => {
     vi.mocked(findOrderByIdentity).mockResolvedValue({
       id: "existing",
       name: "홍길동",
-      phoneLast4: "1234",
       items: [],
       totalAmount: 0,
       paymentStatus: "none",
@@ -133,7 +130,6 @@ describe("NewOrderView 신규 주문", () => {
     return Array.from({ length: count }, (_, i) => ({
       id: `o${i}`,
       name: `사용자${i}`,
-      phoneLast4: "0000",
       items: [{ menuId, menuName: "메뉴", price: 1000, qty }],
       totalAmount: 1000 * qty,
       paymentStatus: "none" as const,

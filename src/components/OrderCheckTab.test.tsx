@@ -19,7 +19,6 @@ function makeOrder(): Order {
   return {
     id: "o1",
     name: "홍길동",
-    phoneLast4: "1234",
     items: [{ menuId: "m2", menuName: "김밥", price: 3000, qty: 1 }],
     totalAmount: 3000,
     paymentStatus: "none",
@@ -27,9 +26,8 @@ function makeOrder(): Order {
   };
 }
 
-function checkOrder(name: string, phoneLast4: string) {
+function checkOrder(name: string) {
   fireEvent.change(screen.getByPlaceholderText("이름"), { target: { value: name } });
-  fireEvent.change(screen.getByPlaceholderText("0000"), { target: { value: phoneLast4 } });
   fireEvent.click(screen.getByRole("button", { name: "확인" }));
 }
 
@@ -77,7 +75,7 @@ describe("OrderCheckTab 내 주문 확인", () => {
         orders={[]}
         bankInfo={bankInfo}
         deadline={null}
-        prefill={{ name: "홍길동", phoneLast4: "1234" }}
+        prefill={{ name: "홍길동" }}
       />
     );
 

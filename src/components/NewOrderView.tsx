@@ -21,7 +21,6 @@ interface Props {
 
 export default function NewOrderView({ menus, orders, bankInfo, deadline, onCreated }: Props) {
   const [name, setName] = useState("");
-  const [phoneLast4, setPhoneLast4] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [requestNote, setRequestNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -73,7 +72,7 @@ export default function NewOrderView({ menus, orders, bankInfo, deadline, onCrea
       setError("메뉴를 1개 이상 선택해주세요.");
       return;
     }
-    const validationError = validateEntryForm(name, phoneLast4);
+    const validationError = validateEntryForm(name);
     if (validationError) {
       setError(validationError);
       return;
@@ -81,7 +80,7 @@ export default function NewOrderView({ menus, orders, bankInfo, deadline, onCrea
     setSubmitting(true);
     setError("");
     try {
-      const existing = await findOrderByIdentity(name.trim(), phoneLast4);
+      const existing = await findOrderByIdentity(name.trim());
       if (existing) {
         setError("이미 등록된 주문이 있습니다. '주문 확인' 탭에서 확인해주세요.");
         setSubmitting(false);
@@ -89,14 +88,13 @@ export default function NewOrderView({ menus, orders, bankInfo, deadline, onCrea
       }
       await createOrder({
         name: name.trim(),
-        phoneLast4,
         items,
         totalAmount: total,
         paymentStatus: "none",
         isAdminForced: false,
         requestNote: requestNote.trim(),
       });
-      onCreated({ name: name.trim(), phoneLast4 });
+      onCreated({ name: name.trim()});
     } catch {
       setError("주문 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
       setSubmitting(false);
@@ -127,7 +125,7 @@ export default function NewOrderView({ menus, orders, bankInfo, deadline, onCrea
               id="request-note"
               type="text"
               maxLength={REQUEST_NOTE_MAX_LENGTH}
-              placeholder="ex: 김밥에 계란 빼주세요."
+              placeholder="ex: 주문한 일반 김밥 한줄은 계란 빼주세요."
               value={requestNote}
               onChange={(e) => setRequestNote(e.target.value)}
               className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
@@ -138,23 +136,13 @@ export default function NewOrderView({ menus, orders, bankInfo, deadline, onCrea
           </div>
 
           <BankInfoCard bankInfo={bankInfo} />
-
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
+            <p className="font-semibold mb-1">주문자 성함</p>
             <input
               type="text"
-              placeholder="이름"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="h-12 flex-1 rounded-lg border-2 border-stone-300 px-3 text-center font-medium outline-none focus:border-stone-500"
-            />
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={4}
-              placeholder="0000"
-              value={phoneLast4}
-              onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
-              className="h-12 w-28 rounded-lg border-2 border-stone-300 px-3 text-center font-medium tracking-[0.3em] outline-none focus:border-stone-500"
             />
           </div>
 
@@ -162,7 +150,7 @@ export default function NewOrderView({ menus, orders, bankInfo, deadline, onCrea
 
           <button
             type="button"
-            disabled={submitting || total === 0}
+            disabled={submitting || total === 0 || !name.trim()}
             onClick={handleSubmit}
             className="rounded-lg bg-amber-700 py-3 font-medium text-white hover:bg-amber-800 disabled:opacity-50"
           >

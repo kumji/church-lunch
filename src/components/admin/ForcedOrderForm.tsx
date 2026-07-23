@@ -8,7 +8,6 @@ import type { Menu, OrderItem } from "@/lib/types";
 
 export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
   const [name, setName] = useState("");
-  const [phoneLast4, setPhoneLast4] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [requestNote, setRequestNote] = useState("");
   const [saving, setSaving] = useState(false);
@@ -31,8 +30,8 @@ export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage("");
-    if (!name.trim() || !/^\d{4}$/.test(phoneLast4)) {
-      setMessage("이름과 휴대폰 뒷자리 4자리를 정확히 입력해주세요.");
+    if (!name.trim()) {
+      setMessage("이름을 정확히 입력해주세요.");
       return;
     }
     if (items.length === 0) {
@@ -42,7 +41,6 @@ export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
     setSaving(true);
     await createOrder({
       name: name.trim(),
-      phoneLast4,
       items,
       totalAmount: total,
       paymentStatus: "none",
@@ -51,7 +49,6 @@ export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
     });
     setSaving(false);
     setName("");
-    setPhoneLast4("");
     setQuantities({});
     setRequestNote("");
     setMessage("등록되었습니다. (다른 주문과 동일하게 마감 시간 전까지 수정/삭제 가능합니다)");
@@ -69,14 +66,6 @@ export default function ForcedOrderForm({ menus }: { menus: Menu[] }) {
           onChange={(e) => setName(e.target.value)}
           placeholder="이름"
           className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm sm:w-40"
-        />
-        <input
-          inputMode="numeric"
-          maxLength={4}
-          value={phoneLast4}
-          onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
-          placeholder="휴대폰 뒷자리 4자리"
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm tracking-widest sm:w-32"
         />
       </div>
 

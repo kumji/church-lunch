@@ -17,7 +17,6 @@ export interface OrderItem {
 export interface Order {
   id: string;
   name: string;
-  phoneLast4: string;
   items: OrderItem[];
   totalAmount: number;
   // 입금완료 시점의 totalAmount 스냅샷. 이후 메뉴 가격이 바뀌어 totalAmount가
@@ -55,5 +54,4 @@ export interface Config {
 
 export interface Identity {
   name: string;
-  phoneLast4: string;
 }

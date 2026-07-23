@@ -41,13 +41,10 @@ export function amountDiff(order: Order): number | null {
 }
 
 export async function findOrderByIdentity(
-  name: string,
-  phoneLast4: string
-): Promise<Order | null> {
+  name: string): Promise<Order | null> {
   const q = query(
     ordersCol,
-    where("name", "==", name),
-    where("phoneLast4", "==", phoneLast4)
+    where("name", "==", name)
   );
   const snap = await getDocs(q);
   if (snap.empty) return null;

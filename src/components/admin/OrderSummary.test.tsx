@@ -12,7 +12,6 @@ function makeOrder(overrides: Partial<Order>): Order {
   return {
     id: overrides.name ?? "o",
     name: "이름없음",
-    phoneLast4: "1234",
     items: [],
     totalAmount: 0,
     paymentStatus: "none",

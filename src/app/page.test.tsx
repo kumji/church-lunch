@@ -68,12 +68,11 @@ describe("HomePage 랜딩 탭", () => {
     expect(pushMock).toHaveBeenCalledWith("/admin");
   });
 
-  it("주문 완료 후 주문 확인 탭으로 넘어가면서 방금 입력한 이름/번호로 자동 조회된다", async () => {
+  it("주문 완료 후 주문 확인 탭으로 넘어가면서 방금 입력한 이름으로 자동 조회된다", async () => {
     mockMenus = [{ id: "m1", name: "김밥", price: 3000, imgUrl: "" }];
     const createdOrder = {
       id: "o1",
       name: "홍길동",
-      phoneLast4: "1234",
       items: [{ menuId: "m1", menuName: "김밥", price: 3000, qty: 1 }],
       totalAmount: 3000,
       paymentStatus: "none" as const,

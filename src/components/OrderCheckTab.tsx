@@ -17,34 +17,32 @@ interface Props {
 
 export default function OrderCheckTab({ menus, orders, bankInfo, deadline, prefill }: Props) {
   const [name, setName] = useState("");
-  const [phoneLast4, setPhoneLast4] = useState("");
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(false);
   const [order, setOrder] = useState<Order | null | undefined>(undefined);
 
-  async function checkIdentity(checkName: string, checkPhoneLast4: string) {
-    const validationError = validateEntryForm(checkName, checkPhoneLast4);
+  async function checkIdentity(checkName: string) {
+    const validationError = validateEntryForm(checkName);
     if (validationError) {
       setError(validationError);
       return;
     }
     setChecking(true);
     setError("");
-    const found = await findOrderByIdentity(checkName.trim(), checkPhoneLast4);
+    const found = await findOrderByIdentity(checkName.trim());
     setOrder(found);
     setChecking(false);
   }
 
   function handleCheck() {
-    checkIdentity(name, phoneLast4);
+    checkIdentity(name);
   }
 
   useEffect(() => {
     if (!prefill) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 방금 생성된 주문의 이름/번호를 자동으로 채우고 바로 조회한다
     setName(prefill.name);
-    setPhoneLast4(prefill.phoneLast4);
-    checkIdentity(prefill.name, prefill.phoneLast4);
+    checkIdentity(prefill.name);
   }, [prefill]);
 
   return (
@@ -58,15 +56,6 @@ export default function OrderCheckTab({ menus, orders, bankInfo, deadline, prefi
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="h-12 flex-1 rounded-lg border-2 border-stone-300 px-3 text-center font-medium outline-none focus:border-stone-500"
-          />
-          <input
-            type="text"
-            inputMode="numeric"
-            maxLength={4}
-            placeholder="0000"
-            value={phoneLast4}
-            onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
-            className="h-12 w-28 rounded-lg border-2 border-stone-300 px-3 text-center font-medium tracking-[0.3em] outline-none focus:border-stone-500"
           />
         </div>
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}

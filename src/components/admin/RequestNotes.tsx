@@ -30,7 +30,7 @@ export default function RequestNotes({ orders }: { orders: Order[] }) {
               {requests.map((order) => (
                 <tr key={order.id}>
                   <td className="px-3 py-2">
-                    {order.name}({order.phoneLast4})
+                    {order.name}
                   </td>
                   <td className="px-3 py-2">{order.requestNote}</td>
                 </tr>
