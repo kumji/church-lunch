@@ -71,12 +71,25 @@ export default function OrderSummary({ orders }: { orders: Order[] }) {
         ) : (
           <ul className="flex flex-col gap-1">
             {sortedMenuStats.map(([name, stat]) => (
-              <li key={name} className="text-xl font-bold">
+              <li key={name} className="font-bold">
                 {name}: {stat.qty} 개
               </li>
             ))}
           </ul>
         )}
+      </div>
+
+      <div className="rounded-lg border border-stone-200 p-4">
+        <p className="mb-2 text-sm text-stone-900">추가 요청 사항</p>
+        <ul className="flex flex-col gap-1">
+          {visibleOrderRows.map(({ order }) =>
+            order.requestNote ? (
+              <li key={order.id} className="font-bold ">
+                {order.name}: {order.requestNote}
+              </li>
+            ) : null
+          )}
+        </ul>
       </div>
 
       <div className="rounded-lg border border-stone-200 p-4">

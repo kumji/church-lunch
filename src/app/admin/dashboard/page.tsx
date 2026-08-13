@@ -7,6 +7,7 @@ import MenuManager from "@/components/admin/MenuManager";
 import SettingsManager from "@/components/admin/SettingsManager";
 import OrderSummary from "@/components/admin/OrderSummary";
 import PaymentManager from "@/components/admin/PaymentManager";
+import PickupManager from "@/components/admin/PickupManager";
 import ForcedOrderForm from "@/components/admin/ForcedOrderForm";
 import RequestNotes from "@/components/admin/RequestNotes";
 import { subscribeMenus } from "@/lib/menus";
@@ -15,13 +16,14 @@ import { reconcileOrdersWithMenus, subscribeOrders } from "@/lib/orders";
 import { clearAdminAuthed, isAdminAuthed } from "@/lib/session";
 import type { Config, Menu, Order } from "@/lib/types";
 
-type Tab = "menu" | "settings" | "summary" | "payment" | "forced" | "requests";
+type Tab = "menu" | "settings" | "summary" | "payment" | "pickup" | "forced" | "requests";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "menu", label: "메뉴 관리" },
   { key: "settings", label: "마감/계좌 설정" },
   { key: "summary", label: "주문 현황" },
   { key: "payment", label: "입금 확인" },
+  { key: "pickup", label: "픽업 확인" },
   { key: "forced", label: "추가 주문 등록" },
   { key: "requests", label: "추가요청사항" },
 ];
@@ -106,6 +108,7 @@ export default function AdminDashboardPage() {
         {tab === "settings" && <SettingsManager config={config} />}
         {tab === "summary" && <OrderSummary orders={orders} />}
         {tab === "payment" && <PaymentManager orders={orders} />}
+        {tab === "pickup" && <PickupManager orders={orders} />}
         {tab === "forced" && <ForcedOrderForm menus={menus} />}
         {tab === "requests" && <RequestNotes orders={orders} />}
       </div>

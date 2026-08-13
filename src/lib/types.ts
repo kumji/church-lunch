@@ -7,6 +7,13 @@ export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
   confirmed: "입금 완료",
 };
 
+export type PickupStatus = "none" | "confirmed";
+
+export const PICKUP_STATUS_LABEL: Record<PickupStatus, string> = {
+  none: "미픽업",
+  confirmed: "픽업 완료",
+};
+
 export interface OrderItem {
   menuId: string;
   menuName: string;
@@ -23,6 +30,8 @@ export interface Order {
   // 재계산되어도 실제로 확인된 금액을 알 수 있도록 별도 보관한다.
   confirmedAmount?: number;
   paymentStatus: PaymentStatus;
+  // 픽업 여부. 필드가 없으면 미픽업("none")으로 취급한다.
+  pickupStatus?: PickupStatus;
   isAdminForced: boolean;
   createdAt?: number;
   // 주문 시 남긴 추가 요청 사항 (최대 25자). 없으면 빈 문자열이거나 필드 자체가 없다.
