@@ -41,7 +41,7 @@ export default function HomePage() {
       <div className="flex justify-end px-4 pt-3">
         <button
           onClick={() => router.push("/admin")}
-          className="text-xs text-stone-500 hover:text-stone-700"
+          className="font-bold text-stone-500 hover:text-stone-700"
         >
           Admin
         </button>
