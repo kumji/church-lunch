@@ -14,7 +14,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import type { Menu, NewOrder, Order, OrderItem, PaymentStatus } from "./types";
+import type { Menu, NewOrder, Order, OrderItem, PaymentStatus, PickupStatus } from "./types";
 
 const ordersCol = collection(db, "orders");
 
@@ -112,6 +112,16 @@ export async function revertPaymentStatus(order: Order): Promise<void> {
     paymentStatus: "none" as PaymentStatus,
     confirmedAmount: deleteField(),
   });
+}
+
+// 관리자: 픽업 확인 처리 (none -> confirmed).
+export async function setPickupStatus(order: Order, status: PickupStatus): Promise<void> {
+  await updateDoc(doc(db, "orders", order.id), { pickupStatus: status });
+}
+
+// 관리자: 픽업 확인을 되돌려 다시 미픽업 상태로 되돌린다.
+export async function revertPickupStatus(order: Order): Promise<void> {
+  await updateDoc(doc(db, "orders", order.id), { pickupStatus: "none" as PickupStatus });
 }
 
 // 관리자: 대시보드가 열려 있는 동안 메뉴(이름/가격) 최신 값과 어긋난 주문 항목을
