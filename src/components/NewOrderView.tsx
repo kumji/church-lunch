@@ -63,7 +63,10 @@ export default function NewOrderView({ menus, orders, bankInfo, deadline, onCrea
     return (
       <div className="mx-auto mt-10 max-w-md rounded-lg border border-red-200 bg-red-50 p-6 text-center text-red-700">
         마감 시간이 지났습니다. 담당자에게 연락주세요.
+        <BankInfoCard bankInfo={bankInfo} />
       </div>
+
+      
     );
   }
 
